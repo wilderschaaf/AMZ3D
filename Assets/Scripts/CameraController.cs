@@ -5,10 +5,11 @@ public class CameraController : MonoBehaviour
 {
 
     public GameObject player;
-
-    private Vector3 offset;
+    //private Vector3 offset;
     Quaternion targetRotation;
     private Vector3 oldoffset;
+    PlayerScript p;
+    //private bool isMoving;
 
     private bool rotated = false;
     private bool yup = false, ydown = false;
@@ -18,20 +19,26 @@ public class CameraController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        p = player.GetComponent<PlayerScript>();
+        //isMoving = false;
         targetRotation = Quaternion.Euler(new Vector3(0,0,0));
-        offset = transform.position - player.transform.position;
 
-        
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
+        //print(offset);
+        p = player.GetComponent<PlayerScript>();
+       // if (p)
+       // {
+            //print("wukder");
+        //    isMoving = p.getMoving();
+       // }
+        
 
-
-
-        transform.position = player.transform.position + offset;
-
+        transform.position = player.transform.position + p.offset;
+       
         
 
 
@@ -60,7 +67,7 @@ public class CameraController : MonoBehaviour
             targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x - 90, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
             if (!ydown)
             {
-                oldoffset = offset;
+                oldoffset = p.offset;
                 yup = true;
             }
             else
@@ -82,7 +89,7 @@ public class CameraController : MonoBehaviour
             targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x + 90, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
             if (!yup)
             {
-                oldoffset = offset;
+                oldoffset = p.offset;
                 ydown = true;
             }
             else
@@ -103,7 +110,11 @@ public class CameraController : MonoBehaviour
             rotated = false;
         }
 
-        offset = transform.position - player.transform.position;
+        //if (!isMoving)
+        //{
+        //    offset = transform.position - player.transform.position;
+        //}
+        
         
 
     }
@@ -112,22 +123,22 @@ public class CameraController : MonoBehaviour
 
         float elapsedTime = 0.0f;
         Quaternion startingRotation = transform.rotation;
-        Vector3 startingPosition = offset;
+        Vector3 startingPosition = p.offset;
         Vector3 finalPosition;
 
         if (left)
         {
-            finalPosition = new Vector3(-offset.z, offset.y, offset.x);
+            finalPosition = new Vector3(-p.offset.z, p.offset.y, p.offset.x);
         }
         else
         {
-            finalPosition = new Vector3(offset.z, offset.y, -offset.x);
+            finalPosition = new Vector3(p.offset.z, p.offset.y, -p.offset.x);
         }
         if (vert)
         {
             if (gUp && yup)
             {
-                finalPosition = new Vector3(0, offset.magnitude, 0);
+                finalPosition = new Vector3(0, p.offset.magnitude, 0);
             }
             else if ((gUp && !yup) || (!gUp && !ydown))
             {
@@ -135,11 +146,11 @@ public class CameraController : MonoBehaviour
             }
             else
             {
-                finalPosition = new Vector3(0, -offset.magnitude, 0);
+                finalPosition = new Vector3(0, -p.offset.magnitude, 0);
             }
         }
-
-        
+        //print(startingPosition);
+        //print(finalPosition);
         while (elapsedTime < time)
         {
             elapsedTime += Time.deltaTime;
@@ -148,7 +159,7 @@ public class CameraController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(startingRotation, targetRotation, (elapsedTime / time));
 
             // Position
-            offset = Vector3.Lerp(startingPosition, finalPosition, (elapsedTime/time));
+            p.offset = Vector3.Lerp(startingPosition, finalPosition, (elapsedTime/time));
             
             yield return new WaitForEndOfFrame();
         }
