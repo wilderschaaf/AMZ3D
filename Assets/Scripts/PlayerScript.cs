@@ -8,7 +8,9 @@ public class PlayerScript : MonoBehaviour {
     Vector3 movement;
     private bool isMoving;
     private bool exited = false;
-    private bool safe = true;
+    public bool safe = true;
+    public bool lockturn = false;
+    CameraController c;
 
     public Vector3 offset;
     Vector3 oldoffset;
@@ -20,8 +22,8 @@ public class PlayerScript : MonoBehaviour {
     void Start() {
         isMoving = false;
         rb = GetComponent<Rigidbody>();
+        c = cam.GetComponent<CameraController>();
         offset = (cam.transform.position - transform.position);
-        //print(offset);
         fov = cam.fieldOfView;
     }
 
@@ -35,7 +37,7 @@ public class PlayerScript : MonoBehaviour {
 
        
         
-        if (Input.GetKeyDown("space"))
+        if (Input.GetKeyDown("space") & !c.rotated)
         {
             rb.AddForce(offset.normalized * force);
             print(safe);
@@ -43,9 +45,9 @@ public class PlayerScript : MonoBehaviour {
             {
                 oldoffset = offset;
                 exited = true;
-                //print("exit");
                 isMoving = true;
                 StartCoroutine(offslerp(isMoving));
+                lockturn = true;
             }
         }
 
@@ -91,7 +93,7 @@ public class PlayerScript : MonoBehaviour {
         if (exited)
         {
             //print(oldoffset);
-            
+            lockturn = false;
             rb.velocity = new Vector3(0, 0, 0);
             isMoving = false;
             StartCoroutine(offslerp(isMoving));
@@ -108,7 +110,6 @@ public class PlayerScript : MonoBehaviour {
         float camview;
         if (inout)
         {
-            //startingPosition = oldoffset;
             finalPosition = oldoffset * -5;
             camview = 40;
         }
