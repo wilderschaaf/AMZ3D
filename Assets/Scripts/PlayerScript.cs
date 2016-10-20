@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour {
 
@@ -11,6 +12,7 @@ public class PlayerScript : MonoBehaviour {
     public bool safe = true;
     public bool lockturn = false;
     CameraController c;
+    public Text wintext;
 
     public Vector3 offset;
     Vector3 oldoffset;
@@ -25,6 +27,7 @@ public class PlayerScript : MonoBehaviour {
         c = cam.GetComponent<CameraController>();
         offset = (cam.transform.position - transform.position);
         fov = cam.fieldOfView;
+        wintext.text = "";
     }
 
     public bool getMoving()
@@ -40,7 +43,7 @@ public class PlayerScript : MonoBehaviour {
         if (Input.GetKeyDown("space") & !c.rotated)
         {
             rb.AddForce(offset.normalized * force);
-            print(safe);
+            //print(safe);
             if (safe)
             {
                 oldoffset = offset;
@@ -61,10 +64,26 @@ public class PlayerScript : MonoBehaviour {
     }
     void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("Exit"))
+        {
+            print("Triggered");
+            rb.useGravity = true;
+            wintext.text = "You thought the maze was bad. Welcome to the unending void.";
+            foreach ( GameObject go in FindObjectsOfType<GameObject>())
+            {
+                
+                if(!go.CompareTag("PTag") && !go.CompareTag("MainCamera") && !go.CompareTag("wintext"))
+                {
+                    go.SetActive(false);
+                }
+                
+            }
+
+        }
         Vector3 newpos = new Vector3();
         if ((int) rb.velocity.x < 0)
         {
-            print(other.transform.position.x);
+            //print(other.transform.position.x);
             newpos.Set(other.transform.position.x + 2.5f, rb.position.y, rb.position.z);
         }
         else if ((int)rb.velocity.x > 0)

@@ -9,8 +9,6 @@ public class CameraController : MonoBehaviour
     Quaternion targetRotation;
     private Vector3 oldoffset;
     PlayerScript p;
-    Rigidbody crb;
-    private Vector3 torqueVect;
     //private bool isMoving;
     float mx, my, mx2, my2;
     Quaternion v;
@@ -26,9 +24,7 @@ public class CameraController : MonoBehaviour
     {
         yrot = 0;
         xrot = 0;
-        torqueVect = new Vector3(0, 0, 0);
         p = player.GetComponent<PlayerScript>();
-        crb = GetComponent<Rigidbody>();
         targetRotation = Quaternion.Euler(new Vector3(0,0,0));
         
         print(transform.rotation);
@@ -130,7 +126,7 @@ public class CameraController : MonoBehaviour
             mx2 = mx2 < 40 ? mx2 : 40;
             my2 = 40 * (Input.mousePosition.y - Screen.height/2) / (Screen.height/2);
             my2 = my2 < 40 ? my2 : 40;
-            print(transform.rotation.eulerAngles.y);
+            //print(transform.rotation.eulerAngles.y);
 
             v.eulerAngles = new Vector3(-my2 - xrot, mx2 + yrot, 0);
             if (xrot != 0)
