@@ -13,6 +13,7 @@ public class CameraController : MonoBehaviour
     float mx, my, mx2, my2;
     Quaternion v;
     float yrot, xrot;
+    bool horRight = false, horLeft = false, vertUp = false, vertDown = false;
 
     public bool rotated = false;
     private bool yup = false, ydown = false;
@@ -49,24 +50,26 @@ public class CameraController : MonoBehaviour
         if (!p.lockturn && p.safe)
         {
             
-            if (Input.GetAxis("Horizontal") > 0 && !rotated && !(ydown || yup))
+            if (horRight && !rotated && !(ydown || yup))
             {
                 targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + 90, transform.rotation.eulerAngles.z);
-                StartCoroutine(rotateTo(.3f, false, false, false));
+                StartCoroutine(rotateTo(.5f, false, false, false));
                 rotated = true;
                 time = Time.time;
                 yrot += 90;
+                
             }
-            else if (Input.GetAxis("Horizontal") < 0 && !rotated && !(ydown || yup))
+            else if (horLeft && !rotated && !(ydown || yup))
             {
 
                 targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y - 90, transform.rotation.eulerAngles.z);
-                StartCoroutine(rotateTo(.3f, true, false, false));
+                StartCoroutine(rotateTo(.5f, true, false, false));
                 rotated = true;
                 time = Time.time;
                 yrot -= 90;
+                
             }
-            else if (Input.GetAxis("Vertical") > 0 && !rotated && !yup)
+            else if (vertUp && !rotated && !yup)
             {
                 targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x - 90, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
                 xrot += 90;
@@ -83,12 +86,12 @@ public class CameraController : MonoBehaviour
 
 
 
-                StartCoroutine(rotateTo(.3f, false, true, true));
+                StartCoroutine(rotateTo(.5f, false, true, true));
                 rotated = true;
                 time = Time.time;
 
             }
-            else if (Input.GetAxis("Vertical") < 0 && !rotated && !ydown)
+            else if (vertDown && !rotated && !ydown)
             {
                 targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x + 90, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
                 xrot -= 90;
@@ -104,14 +107,18 @@ public class CameraController : MonoBehaviour
 
 
 
-                StartCoroutine(rotateTo(.3f, false, false, true));
+                StartCoroutine(rotateTo(.5f, false, false, true));
                 rotated = true;
                 time = Time.time;
 
             }
             
         }
-        if (Time.time - time > .4)
+        else
+        {
+            horRight = horLeft = vertUp = vertDown = false;
+        }
+        if (Time.time - time > .5)
         {
             rotated = false;
         }
@@ -122,11 +129,26 @@ public class CameraController : MonoBehaviour
         
         while (true)
         {
-            mx2 = 40 * (Input.mousePosition.x - Screen.width/2)/(Screen.width/2);
-            mx2 = mx2 < 40 ? mx2 : 40;
+            mx2 = (40 * (Input.mousePosition.x - Screen.width/2)/(Screen.width/2));
+            //print(mx2);
+            if (mx2 >= 40 && horRight == false)
+            {
+                horRight = true;
+            }
+            else if (mx2 <= -40 && horLeft == false)
+            {
+                horLeft = true;
+            }
             my2 = 40 * (Input.mousePosition.y - Screen.height/2) / (Screen.height/2);
-            my2 = my2 < 40 ? my2 : 40;
-            //print(transform.rotation.eulerAngles.y);
+            if (my2 >= 40 && vertUp == false)
+            {
+                vertUp = true;
+            }
+            else if (my2 <= -40 && vertDown == false)
+            {
+                vertDown = true;
+            }
+
 
             v.eulerAngles = new Vector3(-my2 - xrot, mx2 + yrot, 0);
             if (xrot != 0)
@@ -186,6 +208,7 @@ public class CameraController : MonoBehaviour
             
             yield return new WaitForEndOfFrame();
         }
+        horRight = horLeft = vertUp = vertDown = false;
         yield return 0;
     }
 
