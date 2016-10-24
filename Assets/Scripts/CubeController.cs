@@ -11,10 +11,14 @@ public class CubeController : MonoBehaviour {
 	void Start () {
         spincontroller = GetComponent<Animator>();
         p = player.GetComponent<PlayerScript>();
-	}
+        float randintro = Random.value;
+        spincontroller.Play("DefAnim", 0, randintro);
+    }
 	
 	// Update is called once per frame
 	void Update () {
+        
+
         Vector3 noffs = p.getOffset().normalized;
         if(noffs== (transform.position - player.transform.position).normalized)
         {
