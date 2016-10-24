@@ -14,7 +14,7 @@ public class PlayerScript : MonoBehaviour {
     CameraController c;
     public Text wintext;
 
-    public Vector3 offset;
+    private Vector3 offset;
     Vector3 oldoffset;
     public float speed;
     public float force;
@@ -30,6 +30,16 @@ public class PlayerScript : MonoBehaviour {
         wintext.text = "";
     }
 
+    public Vector3 getOffset()
+    {
+        return offset;
+    }
+
+    public void setOffset(Vector3 off)
+    {
+        offset = off;
+    }
+
     public bool getMoving()
     {
         return isMoving;
@@ -40,7 +50,7 @@ public class PlayerScript : MonoBehaviour {
 
        
         
-        if (Input.GetKeyDown("space") & !c.rotated)
+        if ((Input.GetKeyDown("space") || Input.GetMouseButtonDown(0)) & !c.getRot())
         {
             rb.AddForce(offset.normalized * force);
             //print(safe);
