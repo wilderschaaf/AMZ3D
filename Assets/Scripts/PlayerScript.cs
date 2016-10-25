@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerScript : MonoBehaviour {
 
@@ -77,57 +78,62 @@ public class PlayerScript : MonoBehaviour {
         if (other.CompareTag("Exit"))
         {
             print("Triggered");
-            rb.useGravity = true;
-            wintext.text = "You thought the maze was bad. Welcome to the unending void.";
-            foreach ( GameObject go in FindObjectsOfType<GameObject>())
+            SceneManager.LoadScene(1);
+            //rb.useGravity = true;
+            //wintext.text = "You thought the maze was bad. Welcome to the unending void.";
+            //foreach ( GameObject go in FindObjectsOfType<GameObject>())
+            //{
+
+            //    if(!go.CompareTag("PTag") && !go.CompareTag("MainCamera") && !go.CompareTag("wintext"))
+            //    {
+            //        go.SetActive(false);
+            //    }
+
+            //}
+
+        }
+        if (other.CompareTag("RWall"))
+        {
+            Vector3 newpos = new Vector3();
+            if ((int)rb.velocity.x < 0)
             {
-                
-                if(!go.CompareTag("PTag") && !go.CompareTag("MainCamera") && !go.CompareTag("wintext"))
-                {
-                    go.SetActive(false);
-                }
-                
+                //print(other.transform.position.x);
+                newpos.Set(other.transform.position.x + 2.5f, rb.position.y, rb.position.z);
+            }
+            else if ((int)rb.velocity.x > 0)
+            {
+                newpos.Set(other.transform.position.x - 2.5f, rb.position.y, rb.position.z);
+            }
+            else if ((int)rb.velocity.y < 0)
+            {
+                newpos.Set(rb.position.x, transform.position.y + 2.5f, rb.position.z);
+            }
+            else if ((int)rb.velocity.y > 0)
+            {
+                newpos.Set(rb.position.x, other.transform.position.y - 2.5f, rb.position.z);
+            }
+            else if ((int)rb.velocity.z < 0)
+            {
+                newpos.Set(rb.position.x, rb.position.y, other.transform.position.z + 2.5f);
+            }
+            else if ((int)rb.velocity.z > 0)
+            {
+                newpos.Set(rb.position.x, rb.position.y, other.transform.position.z - 2.5f);
             }
 
-        }
-        Vector3 newpos = new Vector3();
-        if ((int) rb.velocity.x < 0)
-        {
-            //print(other.transform.position.x);
-            newpos.Set(other.transform.position.x + 2.5f, rb.position.y, rb.position.z);
-        }
-        else if ((int)rb.velocity.x > 0)
-        {
-            newpos.Set(other.transform.position.x - 2.5f, rb.position.y, rb.position.z);
-        }
-        else if ((int)rb.velocity.y < 0)
-        {
-            newpos.Set(rb.position.x, other.transform.position.y + 2.5f, rb.position.z);
-        }
-        else if ((int)rb.velocity.y > 0)
-        {
-            newpos.Set(rb.position.x, other.transform.position.y - 2.5f, rb.position.z);
-        }
-        else if ((int)rb.velocity.z < 0)
-        {
-            newpos.Set(rb.position.x, rb.position.y, other.transform.position.z + 2.5f);
-        }
-        else if ((int)rb.velocity.z > 0)
-        {
-            newpos.Set(rb.position.x, rb.position.y, other.transform.position.z - 2.5f);
-        }
 
+            if (exited) { rb.position = newpos; cam.transform.position = newpos + oldoffset; }
+            if (exited)
+            {
+                //print(oldoffset);
+                lockturn = false;
+                rb.velocity = new Vector3(0, 0, 0);
+                isMoving = false;
+                StartCoroutine(offslerp(isMoving));
+
+            }
+        }
         
-        if (exited) { rb.position = newpos; cam.transform.position = newpos + oldoffset; }
-        if (exited)
-        {
-            //print(oldoffset);
-            lockturn = false;
-            rb.velocity = new Vector3(0, 0, 0);
-            isMoving = false;
-            StartCoroutine(offslerp(isMoving));
-
-        }
     }
 
 

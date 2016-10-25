@@ -135,7 +135,6 @@ public class CameraController : MonoBehaviour
         {
             mx2 = (50 * (Input.mousePosition.x - Screen.width / 2) / (Screen.width / 2));
 
-            print(mx2);
             if (mx2 >= 30 && horRight == false)
             {
                 horRight = true;
@@ -202,6 +201,7 @@ public class CameraController : MonoBehaviour
         }
         float oy = yrot;
         float ox = xrot;
+        p.safe = false;
         while (elapsedTime < time)
         {
             elapsedTime += Time.deltaTime;
@@ -220,6 +220,7 @@ public class CameraController : MonoBehaviour
         }
         yrot = oy + ydest;
         xrot = ox + xdest;
+        p.safe = true;
         horRight = horLeft = vertUp = vertDown = false;
         yield return 0;
     }
