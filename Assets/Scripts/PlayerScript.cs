@@ -79,17 +79,6 @@ public class PlayerScript : MonoBehaviour {
         {
             print("Triggered");
             SceneManager.LoadScene(1);
-            //rb.useGravity = true;
-            //wintext.text = "You thought the maze was bad. Welcome to the unending void.";
-            //foreach ( GameObject go in FindObjectsOfType<GameObject>())
-            //{
-
-            //    if(!go.CompareTag("PTag") && !go.CompareTag("MainCamera") && !go.CompareTag("wintext"))
-            //    {
-            //        go.SetActive(false);
-            //    }
-
-            //}
 
         }
         if (other.CompareTag("RWall"))
@@ -106,7 +95,7 @@ public class PlayerScript : MonoBehaviour {
             }
             else if ((int)rb.velocity.y < 0)
             {
-                newpos.Set(rb.position.x, transform.position.y + 2.5f, rb.position.z);
+                newpos.Set(rb.position.x, other.transform.position.y + 2.5f, rb.position.z);
             }
             else if ((int)rb.velocity.y > 0)
             {

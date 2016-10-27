@@ -130,28 +130,41 @@ public class CameraController : MonoBehaviour
 
     public IEnumerator look()
     {
-
+        bool reset = true;
         while (true)
         {
             mx2 = (50 * (Input.mousePosition.x - Screen.width / 2) / (Screen.width / 2));
-
-            if (mx2 >= 30 && horRight == false)
-            {
-                horRight = true;
-            }
-            else if (mx2 <= -30 && horLeft == false)
-            {
-                horLeft = true;
-            }
             my2 = 40 * (Input.mousePosition.y - Screen.height / 2) / (Screen.height / 2);
-            if (my2 >= 30 && vertUp == false)
+
+            if (mx2 < 30 && mx2 > -30 && my2 < 30 && my2 > -30)
             {
-                vertUp = true;
+                reset = true;
             }
-            else if (my2 <= -30 && vertDown == false)
+            if (reset)
             {
-                vertDown = true;
+                if (mx2 >= 30 && horRight == false)
+                {
+                    horRight = true;
+                    reset = false;
+                }
+                else if (mx2 <= -30 && horLeft == false)
+                {
+                    horLeft = true;
+                    reset = false;
+                }
+
+                if (my2 >= 30 && vertUp == false)
+                {
+                    vertUp = true;
+                    reset = false;
+                }
+                else if (my2 <= -30 && vertDown == false)
+                {
+                    vertDown = true;
+                    reset = false;
+                }
             }
+            
 
 
             v.eulerAngles = new Vector3(-my2 - xrot, mx2 + yrot, 0);
