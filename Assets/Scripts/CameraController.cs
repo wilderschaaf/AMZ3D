@@ -24,12 +24,12 @@ public class CameraController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        yrot = 0;
+        yrot = transform.rotation.eulerAngles.y;
         xrot = 0;
         p = player.GetComponent<PlayerScript>();
         targetRotation = Quaternion.Euler(new Vector3(0, 0, 0));
 
-        print(transform.rotation);
+        print(yrot);
         StartCoroutine(look());
     }
 

@@ -78,7 +78,11 @@ public class PlayerScript : MonoBehaviour {
         if (other.CompareTag("Exit"))
         {
             print("Triggered");
-            SceneManager.LoadScene(1);
+            if (SceneManager.sceneCountInBuildSettings > SceneManager.GetActiveScene().buildIndex + 1)
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
+           
 
         }
         if (other.CompareTag("RWall"))
