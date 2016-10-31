@@ -12,9 +12,11 @@ public class CameraController : MonoBehaviour
     //private bool isMoving;
     float mx, my, mx2, my2;
     Quaternion v;
-    float yrot, xrot;
+    private float yrot, xrot;
+    bool horRight = false, horLeft = false, vertUp = false, vertDown = false;
+    float st = .4f;
 
-    public bool rotated = false;
+    private bool rotated = false;
     private bool yup = false, ydown = false;
 
     private float time;
@@ -22,12 +24,12 @@ public class CameraController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        yrot = 0;
+        yrot = transform.rotation.eulerAngles.y;
         xrot = 0;
         p = player.GetComponent<PlayerScript>();
-        targetRotation = Quaternion.Euler(new Vector3(0,0,0));
-        
-        print(transform.rotation);
+        targetRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+
+        print(yrot);
         StartCoroutine(look());
     }
 
@@ -35,44 +37,37 @@ public class CameraController : MonoBehaviour
     void LateUpdate()
     {
 
-        transform.position = player.transform.position + p.offset;
-        //mx = Input.GetAxis("Mouse X");
-        //my = Input.GetAxis("Mouse Y");
-
-        
-
-        //torqueVect = new Vector3(-Mathf.Cos(transform.rotation.eulerAngles.y * (Mathf.PI / 180)) * my, mx, Mathf.Sin(transform.rotation.eulerAngles.y * (Mathf.PI / 180)) * my);
-        
-        //StartCoroutine(look(v));
-        
+        transform.position = player.transform.position + p.getOffset();
 
         if (!p.lockturn && p.safe)
         {
-            
-            if (Input.GetAxis("Horizontal") > 0 && !rotated && !(ydown || yup))
+
+            if (horRight && !rotated && !(ydown || yup))
             {
-                targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + 90, transform.rotation.eulerAngles.z);
-                StartCoroutine(rotateTo(.3f, false, false, false));
+                targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + 60, transform.rotation.eulerAngles.z);
+                StartCoroutine(rotateTo(st, false, false, false, 0 , 90));
                 rotated = true;
                 time = Time.time;
-                yrot += 90;
+                //yrot += 90;
+
             }
-            else if (Input.GetAxis("Horizontal") < 0 && !rotated && !(ydown || yup))
+            else if (horLeft && !rotated && !(ydown || yup))
             {
 
-                targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y - 90, transform.rotation.eulerAngles.z);
-                StartCoroutine(rotateTo(.3f, true, false, false));
+                targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y - 60, transform.rotation.eulerAngles.z);
+                StartCoroutine(rotateTo(st, true, false, false, 0, -90));
                 rotated = true;
                 time = Time.time;
-                yrot -= 90;
+                //yrot -= 90;
+
             }
-            else if (Input.GetAxis("Vertical") > 0 && !rotated && !yup)
+            else if (vertUp && !rotated && !yup)
             {
-                targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x - 90, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
-                xrot += 90;
+                targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x - 60, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+                //xrot += 90;
                 if (!ydown)
                 {
-                    oldoffset = p.offset;
+                    oldoffset = p.getOffset();
                     yup = true;
                 }
                 else
@@ -83,18 +78,18 @@ public class CameraController : MonoBehaviour
 
 
 
-                StartCoroutine(rotateTo(.3f, false, true, true));
+                StartCoroutine(rotateTo(st, false, true, true, 90, 0));
                 rotated = true;
                 time = Time.time;
 
             }
-            else if (Input.GetAxis("Vertical") < 0 && !rotated && !ydown)
+            else if (vertDown && !rotated && !ydown)
             {
-                targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x + 90, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
-                xrot -= 90;
+                targetRotation = Quaternion.Euler(transform.rotation.eulerAngles.x + 60, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+                //xrot -= 90;
                 if (!yup)
                 {
-                    oldoffset = p.offset;
+                    oldoffset = p.getOffset();
                     ydown = true;
                 }
                 else
@@ -104,65 +99,109 @@ public class CameraController : MonoBehaviour
 
 
 
-                StartCoroutine(rotateTo(.3f, false, false, true));
+                StartCoroutine(rotateTo(st, false, false, true, -90, 0));
                 rotated = true;
                 time = Time.time;
 
             }
-            
+
         }
-        if (Time.time - time > .4)
+        else
+        {
+            horRight = horLeft = vertUp = vertDown = false;
+        }
+        if (Time.time - time > st)
         {
             rotated = false;
         }
     }
 
+    public bool getRot()
+    {
+        return rotated;
+    }
+    public float[] xyRots()
+    {
+        float[] outa = new float[2];
+        outa[0] = xrot;
+        outa[1] = yrot;
+        return outa;
+    }
+
     public IEnumerator look()
     {
-        
+        bool reset = true;
         while (true)
         {
-            mx2 = 40 * (Input.mousePosition.x - Screen.width/2)/(Screen.width/2);
-            mx2 = mx2 < 40 ? mx2 : 40;
-            my2 = 40 * (Input.mousePosition.y - Screen.height/2) / (Screen.height/2);
-            my2 = my2 < 40 ? my2 : 40;
-            //print(transform.rotation.eulerAngles.y);
+            mx2 = (50 * (Input.mousePosition.x - Screen.width / 2) / (Screen.width / 2));
+            my2 = 40 * (Input.mousePosition.y - Screen.height / 2) / (Screen.height / 2);
+
+            if (mx2 < 30 && mx2 > -30 && my2 < 30 && my2 > -30)
+            {
+                reset = true;
+            }
+            if (reset)
+            {
+                if (mx2 >= 30 && horRight == false)
+                {
+                    horRight = true;
+                    reset = false;
+                }
+                else if (mx2 <= -30 && horLeft == false)
+                {
+                    horLeft = true;
+                    reset = false;
+                }
+
+                if (my2 >= 30 && vertUp == false)
+                {
+                    vertUp = true;
+                    reset = false;
+                }
+                else if (my2 <= -30 && vertDown == false)
+                {
+                    vertDown = true;
+                    reset = false;
+                }
+            }
+            
+
 
             v.eulerAngles = new Vector3(-my2 - xrot, mx2 + yrot, 0);
             if (xrot != 0)
             {
-                if ((xrot > 0 && my2>0) || (xrot < 0 && my2 < 0))
+                if ((xrot > 0 && my2 > 0) || (xrot < 0 && my2 < 0))
                 {
                     my2 = 0;
                 }
                 v.eulerAngles = new Vector3(-my2 - xrot, yrot, -mx2);
             }
 
-            transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, v ,Time.time/100);
+            transform.rotation = v;
             yield return new WaitForEndOfFrame();
         }
     }
 
-    public IEnumerator rotateTo(float time, bool left, bool gUp, bool vert)
+    public IEnumerator rotateTo(float time, bool left, bool gUp, bool vert, float xdest, float ydest)
     {
 
         float elapsedTime = 0.0f;
         Quaternion startingRotation = transform.rotation;
-        Vector3 startingPosition = p.offset;
+        Vector3 startingPosition = p.getOffset();
         Vector3 finalPosition;
         if (left)
         {
-            finalPosition = new Vector3(-p.offset.z, p.offset.y, p.offset.x);
+            finalPosition = new Vector3(-p.getOffset().z, p.getOffset().y, p.getOffset().x);
         }
         else
         {
-            finalPosition = new Vector3(p.offset.z, p.offset.y, -p.offset.x);
+            finalPosition = new Vector3(p.getOffset().z, p.getOffset().y, -p.getOffset().x);
         }
         if (vert)
         {
             if (gUp && yup)
             {
-                finalPosition = new Vector3(0, p.offset.magnitude, 0);
+                finalPosition = new Vector3(0, p.getOffset().magnitude, 0);
             }
             else if ((gUp && !yup) || (!gUp && !ydown))
             {
@@ -170,22 +209,32 @@ public class CameraController : MonoBehaviour
             }
             else
             {
-                finalPosition = new Vector3(0, -p.offset.magnitude, 0);
+                finalPosition = new Vector3(0, -p.getOffset().magnitude, 0);
             }
         }
-
+        float oy = yrot;
+        float ox = xrot;
+        p.safe = false;
         while (elapsedTime < time)
         {
             elapsedTime += Time.deltaTime;
 
             // Rotation
             transform.rotation = Quaternion.Slerp(startingRotation, targetRotation, (elapsedTime / time));
+            yrot += (Time.deltaTime / time) * ydest;
+            xrot += (Time.deltaTime / time) * xdest;
 
             // Position
-            p.offset = Vector3.Lerp(startingPosition, finalPosition, (elapsedTime/time));
-            
+            p.setOffset(Vector3.Lerp(startingPosition, finalPosition, (elapsedTime / time)));
+
+
+
             yield return new WaitForEndOfFrame();
         }
+        yrot = oy + ydest;
+        xrot = ox + xdest;
+        p.safe = true;
+        horRight = horLeft = vertUp = vertDown = false;
         yield return 0;
     }
 
